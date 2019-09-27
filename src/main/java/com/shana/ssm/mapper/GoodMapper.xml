@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shana.ssm.mapper.GoodMapper">
+  <resultMap id="BaseResultMap" type="com.shana.ssm.pojo.Good">
+    <id column="goodid" jdbcType="INTEGER" property="goodid" />
+    <result column="gname" jdbcType="VARCHAR" property="gname" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="nowprice" jdbcType="DOUBLE" property="nowprice" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="goodimg" jdbcType="VARCHAR" property="goodimg" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="createDate" jdbcType="DATE" property="createdate" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_goods
+    where goodid = #{goodid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteSome">
+    delete from t_goods where goodid in
+    <foreach collection="strs" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+
+  </delete>
+
+  <insert id="insert" parameterType="com.shana.ssm.pojo.Good">
+    insert into t_goods (goodid, gname, count, 
+      price, nowprice, address, 
+      goodimg, category, createDate, 
+      state)
+    values (#{goodid,jdbcType=INTEGER}, #{gname,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER}, 
+      #{price,jdbcType=DOUBLE}, #{nowprice,jdbcType=DOUBLE}, #{address,jdbcType=VARCHAR}, 
+      #{goodimg,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, #{createdate,jdbcType=DATE}, 
+      #{state,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.shana.ssm.pojo.Good">
+    update t_goods
+    set gname = #{gname,jdbcType=VARCHAR},
+      count = #{count,jdbcType=INTEGER},
+      price = #{price,jdbcType=DOUBLE},
+      nowprice = #{nowprice,jdbcType=DOUBLE},
+      address = #{address,jdbcType=VARCHAR},
+      goodimg = #{goodimg,jdbcType=VARCHAR},
+      category = #{category,jdbcType=VARCHAR},
+      createDate = #{createdate,jdbcType=DATE},
+      state = #{state,jdbcType=INTEGER}
+    where goodid = #{goodid,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select goodid, gname, count, price, nowprice, address, goodimg, category, createDate, 
+    state
+    from t_goods
+    where goodid = #{goodid,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select goodid, gname, count, price, nowprice, address, goodimg, category, createDate, 
+    state
+    from t_goods
+  </select>
+
+  <select id="selectLimitedGoods" resultMap="BaseResultMap">
+    select goodid, gname, count, price, nowprice, address, goodimg, category, createDate,
+    state
+    from t_goods
+    <where>
+      <include refid="lim"></include>
+    </where>
+  </select>
+
+  <sql id="lim">
+    <if test="qv.gname!=null and qv.gname.toString().trim()!=''">
+      and gname like '%${qv.gname}%'
+    </if>
+    <if test="qv.category!=null">
+      <if test="qv.category.toString()!='0'.toString() ">
+      and category = #{qv.category}
+      </if>
+    </if>
+    <if test="qv.state!=null and qv.state!=''">
+      and state=#{qv.state}
+    </if>
+  </sql>
+</mapper>

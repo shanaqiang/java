@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--spring启动注解-->
+    <context:annotation-config></context:annotation-config>
+    <!--spring扫描包-->
+    <context:component-scan base-package="com.shana.ssm">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:exclude-filter>
+    </context:component-scan>
+
+    <!--引入数据库的配置信息-->
+    <context:property-placeholder location="classpath*:db.properties"></context:property-placeholder>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="user" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}"></property>
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"></property>
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}"></property>
+    </bean>
+
+
+    <!-- 创建SQLSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入mybatis的主配置文件 -->
+        <property name="configLocation" value="classpath:sqlMapConfig.xml" />
+        <!-- 需要一个数据库连接  此处我们提供一个数据源 -->
+        <property name="dataSource"  ref="dataSource"/>
+    </bean>
+
+    <!-- 通过扫描某一个包下的所有mapper接口 进行创建代理对象 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 遵循：mapper.xml文件和mapper.java文件 同名并且在同一个目录
+            每一个mapper接口的id  就是mapper接口名字的  把首字母小写
+
+            dao
+         -->
+        <property name="basePackage" value="com.shana.ssm.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+
+
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+
+    <!--配置一个事务管理器  事务的通知-->
+    <bean id="tx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--配置Spring对生命式事务的注解驱动-->
+    <tx:annotation-driven transaction-manager="tx"></tx:annotation-driven>
+
+</beans>
