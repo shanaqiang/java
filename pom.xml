@@ -12,7 +12,7 @@
   <name>SsmTest01 Maven Webapp</name>
 
   <properties>
-    <spring.version>4.3.20.RELEASE</spring.version>
+    <spring.version>6.0.0</spring.version>
     <mybatis.version>3.4.6</mybatis.version>
     <mysql.version>5.1.42</mysql.version>
   </properties>
